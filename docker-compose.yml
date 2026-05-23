@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: audit_backend
     restart: unless-stopped
-    command: sh -c "python manage.py migrate && python manage.py ensure_superuser && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+    command: sh -c "python manage.py migrate && python controles/inserir_base/inserir_base.py && python manage.py ensure_superuser && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
       DEBUG: "False"

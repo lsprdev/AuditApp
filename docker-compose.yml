@@ -33,10 +33,13 @@ services:
       dockerfile: Dockerfile
     container_name: audit_backend
     restart: unless-stopped
-    command: sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+    command: sh -c "python manage.py migrate && python manage.py ensure_superuser && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
       DEBUG: "False"
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_PASSWORD: admin
       DB_NAME: audit_premium
       DB_USER: audit_user
       DB_PASSWORD: audit_secure_password_2026

@@ -38,9 +38,8 @@ def inserir_normas():
     dados = abrir_csv('normas.csv')
     for row in dados:
         Norma.objects.update_or_create(
-            id_norma=row['id_norma'],
+            nome=row['nome'],
             defaults={
-                'nome': row['nome'],
                 'descricao': row['descricao'],
                 'versao': row['versao']
             }

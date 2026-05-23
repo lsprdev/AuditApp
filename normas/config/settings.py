@@ -10,15 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def env_list(name, default):
-    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
+    return [
+        item.strip()
+        for item in os.environ.get(name, default).split(",")
+        if item.strip()
+    ]
 
 
 SECRET_KEY = os.environ.get(
@@ -30,7 +34,7 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = env_list(
     "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,backend,auditapp.lsx.li",
+    "localhost,127.0.0.1,backend,auditpremium.lsx.li",
 )
 
 AUTH_USER_MODEL = "users.Usuario"
@@ -52,9 +56,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
 MIDDLEWARE = [
@@ -70,10 +72,12 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost,http://127.0.0.1,http://localhost:5173,http://127.0.0.1:5173,https://auditapp.lsx.li",
+    "http://localhost,http://127.0.0.1,http://localhost:5173,http://127.0.0.1:5173,https://auditpremium.lsx.li",
 )
 CORS_ALLOW_ALL_ORIGINS = False
-CSRF_TRUSTED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin.startswith("https://")]
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in CORS_ALLOWED_ORIGINS if origin.startswith("https://")
+]
 
 ROOT_URLCONF = "config.urls"
 

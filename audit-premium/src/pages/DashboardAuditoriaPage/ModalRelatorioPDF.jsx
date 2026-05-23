@@ -1,7 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { FileText, X, Download, Loader2, CheckSquare, Square, ListTree } from "lucide-react";
+import {
+    CheckSquare,
+    Download,
+    FileText,
+    ListTree,
+    Loader2,
+    Square,
+    X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { controlesUrl } from "../../config/api";
 
-const BASE = "http://localhost:8000/controles";
+const BASE = controlesUrl("");
 
 function token() {
   return localStorage.getItem("access_token");
@@ -21,7 +30,12 @@ function auditLabel(auditoria) {
  *   onGerar(selecionadas, tipoRelatorio) – callback chamado com lista de auditorias comparativas e tipo do PDF
  *   onFechar        – callback para fechar o modal
  */
-export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFechar }) {
+export default function ModalRelatorioPDF({
+  auditoria,
+  gerando,
+  onGerar,
+  onFechar,
+}) {
   const [historico, setHistorico] = useState([]);
   const [selecionadas, setSelecionadas] = useState([]);
   const [tipoRelatorio, setTipoRelatorio] = useState("completo");
@@ -38,7 +52,10 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
         });
         if (!resp.ok) throw new Error();
         const lista = await resp.json();
-        const atualNaLista = lista.find(item => String(item.id_auditoria) === String(auditoria.id_auditoria));
+        const atualNaLista = lista.find(
+          (item) =>
+            String(item.id_auditoria) === String(auditoria.id_auditoria),
+        );
         const auditoriaBase = {
           ...(atualNaLista || {}),
           ...auditoria,
@@ -47,13 +64,25 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
         };
 
         const filtradas = lista
-          .filter(item =>
-            String(item.empresa || "").trim().toLowerCase() === String(auditoriaBase.empresa || "").trim().toLowerCase() &&
-            String(item.norma || "").trim().toLowerCase() === String(auditoriaBase.norma || "").trim().toLowerCase() &&
-            String(item.id_auditoria) !== String(auditoria.id_auditoria)
+          .filter(
+            (item) =>
+              String(item.empresa || "")
+                .trim()
+                .toLowerCase() ===
+                String(auditoriaBase.empresa || "")
+                  .trim()
+                  .toLowerCase() &&
+              String(item.norma || "")
+                .trim()
+                .toLowerCase() ===
+                String(auditoriaBase.norma || "")
+                  .trim()
+                  .toLowerCase() &&
+              String(item.id_auditoria) !== String(auditoria.id_auditoria),
           )
           .sort((a, b) => {
-            const d = new Date(b.data_auditoria || 0) - new Date(a.data_auditoria || 0);
+            const d =
+              new Date(b.data_auditoria || 0) - new Date(a.data_auditoria || 0);
             return d || Number(b.id_auditoria) - Number(a.id_auditoria);
           });
 
@@ -66,13 +95,18 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
     };
 
     buscarHistorico();
-  }, [auditoria.id_auditoria, auditoria.nome, auditoria.empresa, auditoria.norma]);
+  }, [
+    auditoria.id_auditoria,
+    auditoria.nome,
+    auditoria.empresa,
+    auditoria.norma,
+  ]);
 
   function toggleSelecionada(item) {
-    setSelecionadas(prev =>
-      prev.find(a => a.id_auditoria === item.id_auditoria)
-        ? prev.filter(a => a.id_auditoria !== item.id_auditoria)
-        : [...prev, item]
+    setSelecionadas((prev) =>
+      prev.find((a) => a.id_auditoria === item.id_auditoria)
+        ? prev.filter((a) => a.id_auditoria !== item.id_auditoria)
+        : [...prev, item],
     );
   }
 
@@ -82,18 +116,24 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
 
   return (
     <div className="relatorio-modal-overlay" onClick={onFechar}>
-      <div className="relatorio-modal" onClick={e => e.stopPropagation()}>
-
+      <div className="relatorio-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="relatorio-modal__header">
           <div className="relatorio-modal__header-info">
             <FileText size={18} />
             <div>
               <h2>Gerar Relatório PDF</h2>
-              <p>{auditLabel(auditoria)} · {auditoria.empresa} · {auditoria.norma}</p>
+              <p>
+                {auditLabel(auditoria)} · {auditoria.empresa} ·{" "}
+                {auditoria.norma}
+              </p>
             </div>
           </div>
-          <button type="button" className="relatorio-modal__close" onClick={onFechar}>
+          <button
+            type="button"
+            className="relatorio-modal__close"
+            onClick={onFechar}
+          >
             <X size={18} />
           </button>
         </div>
@@ -101,10 +141,18 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
         {/* Seção: tipo do relatório */}
         <div className="relatorio-modal__section">
           <h3>Tipo de relatório</h3>
-          <div className="relatorio-modal__type-grid" role="radiogroup" aria-label="Tipo de relatório">
+          <div
+            className="relatorio-modal__type-grid"
+            role="radiogroup"
+            aria-label="Tipo de relatório"
+          >
             <button
               type="button"
-              className={tipoRelatorio === "completo" ? "relatorio-modal__type relatorio-modal__type--active" : "relatorio-modal__type"}
+              className={
+                tipoRelatorio === "completo"
+                  ? "relatorio-modal__type relatorio-modal__type--active"
+                  : "relatorio-modal__type"
+              }
               onClick={() => setTipoRelatorio("completo")}
               aria-pressed={tipoRelatorio === "completo"}
             >
@@ -116,14 +164,21 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
             </button>
             <button
               type="button"
-              className={tipoRelatorio === "caracteristicas" ? "relatorio-modal__type relatorio-modal__type--active" : "relatorio-modal__type"}
+              className={
+                tipoRelatorio === "caracteristicas"
+                  ? "relatorio-modal__type relatorio-modal__type--active"
+                  : "relatorio-modal__type"
+              }
               onClick={() => setTipoRelatorio("caracteristicas")}
               aria-pressed={tipoRelatorio === "caracteristicas"}
             >
               <ListTree size={16} />
               <span>
                 <strong>Por características da norma</strong>
-                <em>27701: tipos e atributos. 27002: domínio, conceito, tema, capacidades, propriedade e tipos.</em>
+                <em>
+                  27701: tipos e atributos. 27002: domínio, conceito, tema,
+                  capacidades, propriedade e tipos.
+                </em>
               </span>
             </button>
           </div>
@@ -140,7 +195,9 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
 
         {/* Seção: comparativo opcional */}
         <div className="relatorio-modal__section">
-          <h3>Incluir comparativo com auditorias anteriores <em>(opcional)</em></h3>
+          <h3>
+            Incluir comparativo com auditorias anteriores <em>(opcional)</em>
+          </h3>
 
           {erro && <p className="relatorio-modal__erro">{erro}</p>}
 
@@ -152,8 +209,10 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
             </p>
           ) : (
             <ul className="relatorio-modal__lista">
-              {historico.map(item => {
-                const marcada = !!selecionadas.find(a => a.id_auditoria === item.id_auditoria);
+              {historico.map((item) => {
+                const marcada = !!selecionadas.find(
+                  (a) => a.id_auditoria === item.id_auditoria,
+                );
                 return (
                   <li key={item.id_auditoria}>
                     <button
@@ -162,7 +221,11 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
                       onClick={() => toggleSelecionada(item)}
                     >
                       <span className="relatorio-modal__item-check">
-                        {marcada ? <CheckSquare size={16} /> : <Square size={16} />}
+                        {marcada ? (
+                          <CheckSquare size={16} />
+                        ) : (
+                          <Square size={16} />
+                        )}
                       </span>
                       <span className="relatorio-modal__item-info">
                         <strong>{auditLabel(item)}</strong>
@@ -178,7 +241,11 @@ export default function ModalRelatorioPDF({ auditoria, gerando, onGerar, onFecha
 
         {/* Footer */}
         <div className="relatorio-modal__footer">
-          <button type="button" className="relatorio-modal__btn-cancelar" onClick={onFechar}>
+          <button
+            type="button"
+            className="relatorio-modal__btn-cancelar"
+            onClick={onFechar}
+          >
             Cancelar
           </button>
           <button

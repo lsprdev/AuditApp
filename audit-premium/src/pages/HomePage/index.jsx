@@ -1,12 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
-import "./styles.css";
-import Sidebar from "../../components/Sidebar";
 import {
-  BarChart3, Building2, CheckCircle2, ClipboardList, FileText,
-  Library, Shield, TimerReset,
+    BarChart3,
+    Building2,
+    CheckCircle2,
+    ClipboardList,
+    FileText,
+    Library,
+    Shield,
+    TimerReset,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Sidebar from "../../components/Sidebar";
+import { controlesUrl } from "../../config/api";
+import "./styles.css";
 
-const BASE = "http://localhost:8000/controles";
+const BASE = controlesUrl("");
 
 const isConcluida = (status) =>
   String(status || "").toUpperCase() === "CONCLUIDA";
@@ -75,11 +82,13 @@ function RecentAudits({ auditorias }) {
         </div>
       ) : (
         <div className="home-audit-list">
-          {auditorias.map(auditoria => (
+          {auditorias.map((auditoria) => (
             <article key={auditoria.id_auditoria} className="home-audit-row">
               <div>
                 <strong>{auditoria.nome || auditoria.empresa}</strong>
-                <span>{auditoria.empresa} · {auditoria.norma}</span>
+                <span>
+                  {auditoria.empresa} · {auditoria.norma}
+                </span>
               </div>
               <div>
                 <span>{auditoria.data_auditoria}</span>
@@ -146,9 +155,9 @@ export default function HomePage() {
   };
 
   const dashboard = useMemo(() => {
-    const concluidas = auditorias.filter(a => isConcluida(a.status)).length;
+    const concluidas = auditorias.filter((a) => isConcluida(a.status)).length;
     const inconcluidas = auditorias.length - concluidas;
-    const empresasAuditadas = new Set(auditorias.map(a => a.empresa)).size;
+    const empresasAuditadas = new Set(auditorias.map((a) => a.empresa)).size;
     const recentes = [...auditorias]
       .sort((a, b) => new Date(b.data_auditoria) - new Date(a.data_auditoria))
       .slice(0, 5);
@@ -174,7 +183,10 @@ export default function HomePage() {
 
         {erro && <div className="home-alert">{erro}</div>}
 
-        <section className="home-metrics-grid" aria-label="Indicadores do painel">
+        <section
+          className="home-metrics-grid"
+          aria-label="Indicadores do painel"
+        >
           <MetricCard
             icon={ClipboardList}
             label="Auditorias"
@@ -204,7 +216,9 @@ export default function HomePage() {
             icon={Library}
             label="Normas"
             value={loading ? "..." : normas.length}
-            helper={normas.map(n => n.nome).join(" · ") || "Sem normas carregadas"}
+            helper={
+              normas.map((n) => n.nome).join(" · ") || "Sem normas carregadas"
+            }
           />
           <MetricCard
             icon={Shield}
@@ -215,7 +229,10 @@ export default function HomePage() {
         </section>
 
         <div className="home-content-grid">
-          <StatusBar concluida={dashboard.concluidas} inconcluida={dashboard.inconcluidas} />
+          <StatusBar
+            concluida={dashboard.concluidas}
+            inconcluida={dashboard.inconcluidas}
+          />
           <RecentAudits auditorias={dashboard.recentes} />
         </div>
 

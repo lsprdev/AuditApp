@@ -5,15 +5,16 @@
  */
 
 import { useCallback, useState } from "react";
+import { controlesUrl } from "../../config/api";
 
-const BASE = "http://localhost:8000/controles";
+const BASE = controlesUrl("");
 const NORMA_SLUG = { "ISO 27002": "27002", "ISO 27701": "27701" };
 
 const COR = {
-  primaria: [107, 15, 43],      // #6B0F2B
-  verde: [20, 83, 45],          // #14532d
-  vermelho: [127, 29, 29],      // #7f1d1d
-  amarelo: [120, 53, 15],       // #78350f
+  primaria: [107, 15, 43], // #6B0F2B
+  verde: [20, 83, 45], // #14532d
+  vermelho: [127, 29, 29], // #7f1d1d
+  amarelo: [120, 53, 15], // #78350f
   cinzaClaro: [245, 245, 245],
   cinzaMedio: [200, 200, 200],
   cinzaEscuro: [100, 100, 100],
@@ -41,24 +42,42 @@ function token() {
 
 async function carregarRespostas(idAuditoria, norma) {
   const slug = NORMA_SLUG[norma] || "27002";
-  const resp = await fetch(`${BASE}/auditoria/${idAuditoria}/${slug}/respostas/`, {
-    headers: { Authorization: `Bearer ${token()}` },
-  });
+  const resp = await fetch(
+    `${BASE}/auditoria/${idAuditoria}/${slug}/respostas/`,
+    {
+      headers: { Authorization: `Bearer ${token()}` },
+    },
+  );
   if (!resp.ok) throw new Error("Falha ao carregar respostas");
   return resp.json();
 }
 
 function calcularMetricas(controles) {
   const total = controles.length;
-  const conformes = controles.filter(c => c.resposta?.situacao === "CONFORME").length;
-  const naoConformes = controles.filter(c => c.resposta?.situacao === "NAO_CONFORME").length;
-  const naoAplica = controles.filter(c => c.resposta?.situacao === "NAO_APLICA").length;
-  const respondidos = controles.filter(c => c.resposta?.situacao).length;
+  const conformes = controles.filter(
+    (c) => c.resposta?.situacao === "CONFORME",
+  ).length;
+  const naoConformes = controles.filter(
+    (c) => c.resposta?.situacao === "NAO_CONFORME",
+  ).length;
+  const naoAplica = controles.filter(
+    (c) => c.resposta?.situacao === "NAO_APLICA",
+  ).length;
+  const respondidos = controles.filter((c) => c.resposta?.situacao).length;
   const pendentes = total - respondidos;
   const avaliados = total - naoAplica;
   const progresso = total ? Math.round((respondidos / total) * 100) : 0;
   const maturidade = avaliados ? Math.round((conformes / avaliados) * 100) : 0;
-  return { total, conformes, naoConformes, naoAplica, pendentes, avaliados, progresso, maturidade };
+  return {
+    total,
+    conformes,
+    naoConformes,
+    naoAplica,
+    pendentes,
+    avaliados,
+    progresso,
+    maturidade,
+  };
 }
 
 function getTiposControle(item) {
@@ -69,19 +88,24 @@ function getTiposControle(item) {
   ];
 
   if (tipos.length === 0) return ["Sem tipo definido"];
-  return tipos.map(tipo => tipo.nome || tipo.descricao || "Sem tipo definido");
+  return tipos.map(
+    (tipo) => tipo.nome || tipo.descricao || "Sem tipo definido",
+  );
 }
 
 function getAtributosControle(item) {
   const atributos = item.controle?.atributos_anexos || [];
   if (atributos.length === 0) return ["Sem atributo definido"];
-  return atributos.map(atributo => atributo.nome || atributo.descricao || "Sem atributo definido");
+  return atributos.map(
+    (atributo) =>
+      atributo.nome || atributo.descricao || "Sem atributo definido",
+  );
 }
 
 function getControleTags(item, fieldName, fallback) {
   const values = item.controle?.[fieldName] || [];
   if (values.length === 0) return [fallback];
-  return values.map(value => value.nome || value.descricao || fallback);
+  return values.map((value) => value.nome || value.descricao || fallback);
 }
 
 function caracteristicasDaNorma(auditoria) {
@@ -96,11 +120,35 @@ function caracteristicasDaNorma(auditoria) {
   }
 
   return [
-    { titulo: "Domínios de segurança", getValores: item => getControleTags(item, "dominios_seguranca", "Sem domínio definido") },
-    { titulo: "Conceitos de SI", getValores: item => getControleTags(item, "conceitos_si", "Sem conceito definido") },
-    { titulo: "Temas de controle", getValores: item => getControleTags(item, "temas_controle", "Sem tema definido") },
-    { titulo: "Capacidades operacionais", getValores: item => getControleTags(item, "capacidades_operacionais", "Sem capacidade definida") },
-    { titulo: "Propriedades de SI", getValores: item => getControleTags(item, "propriedades_si", "Sem propriedade definida") },
+    {
+      titulo: "Domínios de segurança",
+      getValores: (item) =>
+        getControleTags(item, "dominios_seguranca", "Sem domínio definido"),
+    },
+    {
+      titulo: "Conceitos de SI",
+      getValores: (item) =>
+        getControleTags(item, "conceitos_si", "Sem conceito definido"),
+    },
+    {
+      titulo: "Temas de controle",
+      getValores: (item) =>
+        getControleTags(item, "temas_controle", "Sem tema definido"),
+    },
+    {
+      titulo: "Capacidades operacionais",
+      getValores: (item) =>
+        getControleTags(
+          item,
+          "capacidades_operacionais",
+          "Sem capacidade definida",
+        ),
+    },
+    {
+      titulo: "Propriedades de SI",
+      getValores: (item) =>
+        getControleTags(item, "propriedades_si", "Sem propriedade definida"),
+    },
     { titulo: "Tipos de controle", getValores: getTiposControle },
   ];
 }
@@ -108,9 +156,10 @@ function caracteristicasDaNorma(auditoria) {
 function agruparPorCaracteristica(controles, getValores) {
   const grupos = new Map();
 
-  controles.forEach(item => {
-    getValores(item).forEach(valor => {
-      const key = String(valor || "Sem classificação").trim() || "Sem classificação";
+  controles.forEach((item) => {
+    getValores(item).forEach((valor) => {
+      const key =
+        String(valor || "Sem classificação").trim() || "Sem classificação";
       if (!grupos.has(key)) grupos.set(key, []);
       grupos.get(key).push(item);
     });
@@ -122,7 +171,11 @@ function agruparPorCaracteristica(controles, getValores) {
       controles: itens,
       metricas: calcularMetricas(itens),
     }))
-    .sort((a, b) => b.metricas.maturidade - a.metricas.maturidade || b.controles.length - a.controles.length);
+    .sort(
+      (a, b) =>
+        b.metricas.maturidade - a.metricas.maturidade ||
+        b.controles.length - a.controles.length,
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -256,16 +309,25 @@ function desenharCapa(doc, auditoria, metricas, pageW, pageH) {
 
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  const nomeAuditoria = auditoria.nome || `Auditoria #${auditoria.id_auditoria}`;
+  const nomeAuditoria =
+    auditoria.nome || `Auditoria #${auditoria.id_auditoria}`;
   doc.text(nomeAuditoria, 20, 34);
-  doc.text(`${auditoria.empresa || ""} · ${auditoria.norma || ""} · ${auditoria.data_auditoria || ""}`, 20, 43);
+  doc.text(
+    `${auditoria.empresa || ""} · ${auditoria.norma || ""} · ${auditoria.data_auditoria || ""}`,
+    20,
+    43,
+  );
 
   // Cards de métricas
   const cardY = 66;
   const cardH = 28;
   const cardW = (pageW - 40 - 15) / 4;
   const cards = [
-    { label: "Maturidade", valor: `${metricas.maturidade}%`, cor: COR.primaria },
+    {
+      label: "Maturidade",
+      valor: `${metricas.maturidade}%`,
+      cor: COR.primaria,
+    },
     { label: "Conformes", valor: metricas.conformes, cor: COR.verde },
     { label: "Não Conformes", valor: metricas.naoConformes, cor: COR.vermelho },
     { label: "Pendentes", valor: metricas.pendentes, cor: COR.amarelo },
@@ -277,7 +339,9 @@ function desenharCapa(doc, auditoria, metricas, pageW, pageH) {
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     rgbText(doc, COR.branco);
-    doc.text(String(card.valor), x + cardW / 2, cardY + 14, { align: "center" });
+    doc.text(String(card.valor), x + cardW / 2, cardY + 14, {
+      align: "center",
+    });
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.text(card.label, x + cardW / 2, cardY + 22, { align: "center" });
@@ -288,7 +352,12 @@ function desenharCapa(doc, auditoria, metricas, pageW, pageH) {
   subtitulo(doc, "Progresso da auditoria", 20, y);
   y += 5;
   barraProgresso(doc, 20, y, pageW - 40, 6, metricas.progresso, COR.primaria);
-  corpo(doc, `${metricas.progresso}%  (${metricas.total - metricas.pendentes} de ${metricas.total} respondidos)`, 20, y + 10);
+  corpo(
+    doc,
+    `${metricas.progresso}%  (${metricas.total - metricas.pendentes} de ${metricas.total} respondidos)`,
+    20,
+    y + 10,
+  );
 
   y += 20;
   linhaHorizontal(doc, 20, pageW - 20, y);
@@ -308,9 +377,17 @@ function desenharCapa(doc, auditoria, metricas, pageW, pageH) {
     { label: "Pendentes", valor: metricas.pendentes, cor: COR.primaria },
   ];
   const barW = pageW - 40;
-  itens.forEach(item => {
+  itens.forEach((item) => {
     corpo(doc, item.label, 20, y + 3, 8, COR.cinzaEscuro);
-    barraProgresso(doc, 65, y - 1, barW - 80, 5, metricas.total ? (item.valor / metricas.total) * 100 : 0, item.cor);
+    barraProgresso(
+      doc,
+      65,
+      y - 1,
+      barW - 80,
+      5,
+      metricas.total ? (item.valor / metricas.total) * 100 : 0,
+      item.cor,
+    );
     corpo(doc, `${item.valor}`, pageW - 20, y + 3, 8, COR.preto);
     doc.setFont("helvetica", "normal");
     y += 8;
@@ -340,7 +417,8 @@ function desenharSecaoControles(doc, controles, pageW, pageH) {
     // Estimar altura necessária
     const linhasObs = observacoes ? Math.ceil(observacoes.length / 90) : 0;
     const linhasJust = justificativa ? Math.ceil(justificativa.length / 90) : 0;
-    const alturaEstimada = 14 + (linhasObs + linhasJust) * 5 + evidencias.length * 5 + 10;
+    const alturaEstimada =
+      14 + (linhasObs + linhasJust) * 5 + evidencias.length * 5 + 10;
 
     y = garantirEspaco(doc, y, alturaEstimada, pageH);
 
@@ -368,7 +446,7 @@ function desenharSecaoControles(doc, controles, pageW, pageH) {
       corpo(doc, "Observações:", 23, y, 8, COR.cinzaEscuro);
       y += 5;
       const linhas = doc.splitTextToSize(observacoes, pageW - 46);
-      linhas.slice(0, 4).forEach(linha => {
+      linhas.slice(0, 4).forEach((linha) => {
         y = garantirEspaco(doc, y, 5, pageH);
         corpo(doc, linha, 23, y, 8);
         y += 5;
@@ -380,7 +458,7 @@ function desenharSecaoControles(doc, controles, pageW, pageH) {
       corpo(doc, "Justificativa:", 23, y, 8, COR.cinzaEscuro);
       y += 5;
       const linhas = doc.splitTextToSize(justificativa, pageW - 46);
-      linhas.slice(0, 4).forEach(linha => {
+      linhas.slice(0, 4).forEach((linha) => {
         y = garantirEspaco(doc, y, 5, pageH);
         corpo(doc, linha, 23, y, 8);
         y += 5;
@@ -389,11 +467,25 @@ function desenharSecaoControles(doc, controles, pageW, pageH) {
 
     // Evidências
     if (evidencias.length > 0) {
-      corpo(doc, `Evidências (${evidencias.length}):`, 23, y, 8, COR.cinzaEscuro);
+      corpo(
+        doc,
+        `Evidências (${evidencias.length}):`,
+        23,
+        y,
+        8,
+        COR.cinzaEscuro,
+      );
       y += 5;
-      evidencias.forEach(ev => {
+      evidencias.forEach((ev) => {
         y = garantirEspaco(doc, y, 5, pageH);
-        corpo(doc, `• ${ev.descricao || "Sem descrição"}`, 27, y, 7, COR.cinzaEscuro);
+        corpo(
+          doc,
+          `• ${ev.descricao || "Sem descrição"}`,
+          27,
+          y,
+          7,
+          COR.cinzaEscuro,
+        );
         y += 5;
       });
     }
@@ -426,10 +518,18 @@ function desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH) {
   ].join(" · ");
   corpo(doc, resumo, 24, y, 8, COR.cinzaEscuro);
   y += 6;
-  barraProgresso(doc, 24, y, pageW - 48, 5, grupo.metricas.maturidade, COR.verde);
+  barraProgresso(
+    doc,
+    24,
+    y,
+    pageW - 48,
+    5,
+    grupo.metricas.maturidade,
+    COR.verde,
+  );
   y += 12;
 
-  grupo.controles.forEach(item => {
+  grupo.controles.forEach((item) => {
     const situacao = item.resposta?.situacao || "PENDENTE";
     const corSituacao = SITUACAO_COR[situacao] || COR.cinzaEscuro;
     const labelSituacao = SITUACAO_LABEL[situacao] || situacao;
@@ -439,15 +539,33 @@ function desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH) {
     const justificativa = item.resposta?.justificativa || "";
     const evidencias = item.evidencias || [];
 
-    const linhasTitulo = doc.splitTextToSize(`${indice}  ${tituloControle}`, pageW - 88);
-    const linhasObs = observacoes ? doc.splitTextToSize(observacoes, pageW - 52).slice(0, 3) : [];
-    const linhasJust = justificativa ? doc.splitTextToSize(justificativa, pageW - 52).slice(0, 3) : [];
-    const alturaEstimada = 16 + (linhasTitulo.length * 4) + (linhasObs.length * 5) + (linhasJust.length * 5) + Math.min(evidencias.length, 3) * 5;
+    const linhasTitulo = doc.splitTextToSize(
+      `${indice}  ${tituloControle}`,
+      pageW - 88,
+    );
+    const linhasObs = observacoes
+      ? doc.splitTextToSize(observacoes, pageW - 52).slice(0, 3)
+      : [];
+    const linhasJust = justificativa
+      ? doc.splitTextToSize(justificativa, pageW - 52).slice(0, 3)
+      : [];
+    const alturaEstimada =
+      16 +
+      linhasTitulo.length * 4 +
+      linhasObs.length * 5 +
+      linhasJust.length * 5 +
+      Math.min(evidencias.length, 3) * 5;
 
     y = garantirEspaco(doc, y, alturaEstimada, pageH);
 
     rgbFill(doc, COR.cinzaClaro);
-    doc.rect(24, y - 4, pageW - 48, 10 + Math.max(0, linhasTitulo.length - 1) * 4, "F");
+    doc.rect(
+      24,
+      y - 4,
+      pageW - 48,
+      10 + Math.max(0, linhasTitulo.length - 1) * 4,
+      "F",
+    );
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
     rgbText(doc, COR.preto);
@@ -467,7 +585,7 @@ function desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH) {
     if (linhasObs.length > 0) {
       corpo(doc, "Observacoes:", 27, y, 8, COR.cinzaEscuro);
       y += 5;
-      linhasObs.forEach(linha => {
+      linhasObs.forEach((linha) => {
         y = garantirEspaco(doc, y, 5, pageH);
         corpo(doc, linha, 27, y, 8);
         y += 5;
@@ -477,7 +595,7 @@ function desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH) {
     if (linhasJust.length > 0) {
       corpo(doc, "Justificativa:", 27, y, 8, COR.cinzaEscuro);
       y += 5;
-      linhasJust.forEach(linha => {
+      linhasJust.forEach((linha) => {
         y = garantirEspaco(doc, y, 5, pageH);
         corpo(doc, linha, 27, y, 8);
         y += 5;
@@ -485,11 +603,25 @@ function desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH) {
     }
 
     if (evidencias.length > 0) {
-      corpo(doc, `Evidencias (${evidencias.length}):`, 27, y, 8, COR.cinzaEscuro);
+      corpo(
+        doc,
+        `Evidencias (${evidencias.length}):`,
+        27,
+        y,
+        8,
+        COR.cinzaEscuro,
+      );
       y += 5;
-      evidencias.slice(0, 3).forEach(ev => {
+      evidencias.slice(0, 3).forEach((ev) => {
         y = garantirEspaco(doc, y, 5, pageH);
-        corpo(doc, `- ${ev.descricao || "Sem descricao"}`, 31, y, 7, COR.cinzaEscuro);
+        corpo(
+          doc,
+          `- ${ev.descricao || "Sem descricao"}`,
+          31,
+          y,
+          7,
+          COR.cinzaEscuro,
+        );
         y += 5;
       });
     }
@@ -507,19 +639,29 @@ function desenharSecaoCaracteristicas(doc, auditoria, controles, pageW, pageH) {
 
   titulo(doc, "Relatório por características da norma", 20, y, 14);
   y += 7;
-  corpo(doc, "Os controles abaixo foram agrupados conforme as características aplicáveis a esta norma.", 20, y, 8, COR.cinzaEscuro);
+  corpo(
+    doc,
+    "Os controles abaixo foram agrupados conforme as características aplicáveis a esta norma.",
+    20,
+    y,
+    8,
+    COR.cinzaEscuro,
+  );
   y += 8;
   linhaHorizontal(doc, 20, pageW - 20, y);
   y += 8;
 
-  caracteristicas.forEach(caracteristica => {
-    const grupos = agruparPorCaracteristica(controles, caracteristica.getValores);
+  caracteristicas.forEach((caracteristica) => {
+    const grupos = agruparPorCaracteristica(
+      controles,
+      caracteristica.getValores,
+    );
 
     y = garantirEspaco(doc, y, 18, pageH);
     subtitulo(doc, caracteristica.titulo, 20, y, 11);
     y += 8;
 
-    grupos.forEach(grupo => {
+    grupos.forEach((grupo) => {
       y = desenharBlocoGrupoCaracteristica(doc, grupo, y, pageW, pageH);
     });
   });
@@ -555,21 +697,31 @@ function desenharSecaoComparativo(doc, comparativo, pageW, pageH) {
     doc.setFont("helvetica", "bold");
     const nomeAuditoria = isAtual
       ? "Atual"
-      : (item.auditoria.nome || `#${item.auditoria.id_auditoria}`);
-    doc.text(nomeAuditoria.length > 18 ? `${nomeAuditoria.slice(0, 18)}...` : nomeAuditoria, x + colW / 2, y + 2, { align: "center" });
+      : item.auditoria.nome || `#${item.auditoria.id_auditoria}`;
+    doc.text(
+      nomeAuditoria.length > 18
+        ? `${nomeAuditoria.slice(0, 18)}...`
+        : nomeAuditoria,
+      x + colW / 2,
+      y + 2,
+      { align: "center" },
+    );
   });
   y += 10;
 
   // Linhas de métricas
   const linhas = [
-    { label: "Data", fn: item => item.auditoria.data_auditoria || "-" },
-    { label: "Maturidade", fn: item => `${item.metricas.maturidade}%` },
-    { label: "Progresso", fn: item => `${item.metricas.progresso}%` },
-    { label: "Conformes", fn: item => String(item.metricas.conformes) },
-    { label: "Não Conformes", fn: item => String(item.metricas.naoConformes) },
-    { label: "Não Aplica", fn: item => String(item.metricas.naoAplica) },
-    { label: "Pendentes", fn: item => String(item.metricas.pendentes) },
-    { label: "Total controles", fn: item => String(item.metricas.total) },
+    { label: "Data", fn: (item) => item.auditoria.data_auditoria || "-" },
+    { label: "Maturidade", fn: (item) => `${item.metricas.maturidade}%` },
+    { label: "Progresso", fn: (item) => `${item.metricas.progresso}%` },
+    { label: "Conformes", fn: (item) => String(item.metricas.conformes) },
+    {
+      label: "Não Conformes",
+      fn: (item) => String(item.metricas.naoConformes),
+    },
+    { label: "Não Aplica", fn: (item) => String(item.metricas.naoAplica) },
+    { label: "Pendentes", fn: (item) => String(item.metricas.pendentes) },
+    { label: "Total controles", fn: (item) => String(item.metricas.total) },
   ];
 
   linhas.forEach((linha, li) => {
@@ -592,10 +744,25 @@ function desenharSecaoComparativo(doc, comparativo, pageW, pageH) {
   subtitulo(doc, "Maturidade por auditoria", 20, y);
   y += 8;
   const barMaxW = pageW - 40;
-  comparativo.forEach(item => {
+  comparativo.forEach((item) => {
     const corBar = item.atual ? COR.primaria : COR.cinzaEscuro;
-    corpo(doc, item.auditoria.nome || `#${item.auditoria.id_auditoria}`, 20, y + 3, 8, COR.cinzaEscuro);
-    barraProgresso(doc, 48, y - 1, barMaxW - 30, 6, item.metricas.maturidade, corBar);
+    corpo(
+      doc,
+      item.auditoria.nome || `#${item.auditoria.id_auditoria}`,
+      20,
+      y + 3,
+      8,
+      COR.cinzaEscuro,
+    );
+    barraProgresso(
+      doc,
+      48,
+      y - 1,
+      barMaxW - 30,
+      6,
+      item.metricas.maturidade,
+      corBar,
+    );
     corpo(doc, `${item.metricas.maturidade}%`, pageW - 18, y + 3, 8, COR.preto);
     y += 10;
   });
@@ -605,7 +772,12 @@ function adicionarRodape(doc, pageW) {
   const total = doc.getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
-    linhaHorizontal(doc, 20, pageW - 20, doc.internal.pageSize.getHeight() - 12);
+    linhaHorizontal(
+      doc,
+      20,
+      pageW - 20,
+      doc.internal.pageSize.getHeight() - 12,
+    );
     corpo(
       doc,
       `Gerado em ${new Date().toLocaleDateString("pt-BR")} · Página ${i} de ${total}`,
@@ -617,7 +789,11 @@ function adicionarRodape(doc, pageW) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     rgbText(doc, COR.cinzaEscuro);
-    doc.text("Sistema de Gestão de Normas", 20, doc.internal.pageSize.getHeight() - 6);
+    doc.text(
+      "Sistema de Gestão de Normas",
+      20,
+      doc.internal.pageSize.getHeight() - 6,
+    );
   }
 }
 
@@ -628,90 +804,113 @@ function adicionarRodape(doc, pageW) {
 export function useRelatorioPDF() {
   const [gerando, setGerando] = useState(false);
 
-  const gerarPDF = useCallback(async ({
-    auditoria,
-    controles,
-    comparativo = null,
-    tipoRelatorio = "completo",
-  }) => {
-    setGerando(true);
-    try {
-      const { jsPDF } = await import("jspdf");
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      const pageW = doc.internal.pageSize.getWidth();
-      const pageH = doc.internal.pageSize.getHeight();
+  const gerarPDF = useCallback(
+    async ({
+      auditoria,
+      controles,
+      comparativo = null,
+      tipoRelatorio = "completo",
+    }) => {
+      setGerando(true);
+      try {
+        const { jsPDF } = await import("jspdf");
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
 
-      const metricas = calcularMetricas(controles);
+        const metricas = calcularMetricas(controles);
 
-      // Capa
-      desenharCapa(doc, auditoria, metricas, pageW, pageH);
+        // Capa
+        desenharCapa(doc, auditoria, metricas, pageW, pageH);
 
-      if (tipoRelatorio === "caracteristicas") {
-        desenharSecaoCaracteristicas(doc, auditoria, controles, pageW, pageH);
-      } else {
-        desenharSecaoControles(doc, controles, pageW, pageH);
+        if (tipoRelatorio === "caracteristicas") {
+          desenharSecaoCaracteristicas(doc, auditoria, controles, pageW, pageH);
+        } else {
+          desenharSecaoControles(doc, controles, pageW, pageH);
+        }
+
+        // Comparativo (opcional)
+        if (comparativo && comparativo.length > 1) {
+          desenharSecaoComparativo(doc, comparativo, pageW, pageH);
+        }
+
+        // Rodapé em todas as páginas
+        adicionarRodape(doc, pageW);
+
+        const slugAuditoria = (
+          auditoria.nome || `auditoria_${auditoria.id_auditoria}`
+        )
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "");
+        const sufixoTipo =
+          tipoRelatorio === "caracteristicas"
+            ? "_por_caracteristicas"
+            : "_completo";
+        const nomeArquivo =
+          `relatorio_${slugAuditoria || "auditoria"}${sufixoTipo}.pdf`
+            .toLowerCase()
+            .replace(/\s+/g, "_");
+
+        doc.save(nomeArquivo);
+      } finally {
+        setGerando(false);
       }
-
-      // Comparativo (opcional)
-      if (comparativo && comparativo.length > 1) {
-        desenharSecaoComparativo(doc, comparativo, pageW, pageH);
-      }
-
-      // Rodapé em todas as páginas
-      adicionarRodape(doc, pageW);
-
-      const slugAuditoria = (auditoria.nome || `auditoria_${auditoria.id_auditoria}`)
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "_")
-        .replace(/^_+|_+$/g, "");
-      const sufixoTipo = tipoRelatorio === "caracteristicas" ? "_por_caracteristicas" : "_completo";
-      const nomeArquivo = `relatorio_${slugAuditoria || "auditoria"}${sufixoTipo}.pdf`
-        .toLowerCase()
-        .replace(/\s+/g, "_");
-
-      doc.save(nomeArquivo);
-    } finally {
-      setGerando(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   /**
    * Gera PDF buscando os dados necessários da API.
    * Aceita auditoria principal + lista de auditorias comparativas opcionais.
    */
-  const gerarRelatorio = useCallback(async ({
-    auditoria,
-    contorlesJaCarregados,
-    auditoriasSelecionadas = [],
-    tipoRelatorio = "completo",
-  }) => {
-    setGerando(true);
-    try {
-      // Controles da auditoria principal
-      const controles = contorlesJaCarregados?.length
-        ? contorlesJaCarregados
-        : await carregarRespostas(auditoria.id_auditoria, auditoria.norma);
+  const gerarRelatorio = useCallback(
+    async ({
+      auditoria,
+      contorlesJaCarregados,
+      auditoriasSelecionadas = [],
+      tipoRelatorio = "completo",
+    }) => {
+      setGerando(true);
+      try {
+        // Controles da auditoria principal
+        const controles = contorlesJaCarregados?.length
+          ? contorlesJaCarregados
+          : await carregarRespostas(auditoria.id_auditoria, auditoria.norma);
 
-      // Comparativo
-      let comparativo = null;
-      if (auditoriasSelecionadas.length > 0) {
-        const metricas = calcularMetricas(controles);
-        const historico = await Promise.all(
-          auditoriasSelecionadas.map(async aud => {
-            const respostas = await carregarRespostas(aud.id_auditoria, aud.norma);
-            return { auditoria: aud, metricas: calcularMetricas(respostas), atual: false };
-          })
-        );
-        comparativo = [{ auditoria, metricas, atual: true }, ...historico];
+        // Comparativo
+        let comparativo = null;
+        if (auditoriasSelecionadas.length > 0) {
+          const metricas = calcularMetricas(controles);
+          const historico = await Promise.all(
+            auditoriasSelecionadas.map(async (aud) => {
+              const respostas = await carregarRespostas(
+                aud.id_auditoria,
+                aud.norma,
+              );
+              return {
+                auditoria: aud,
+                metricas: calcularMetricas(respostas),
+                atual: false,
+              };
+            }),
+          );
+          comparativo = [{ auditoria, metricas, atual: true }, ...historico];
+        }
+
+        await gerarPDF({ auditoria, controles, comparativo, tipoRelatorio });
+      } finally {
+        setGerando(false);
       }
-
-      await gerarPDF({ auditoria, controles, comparativo, tipoRelatorio });
-    } finally {
-      setGerando(false);
-    }
-  }, [gerarPDF]);
+    },
+    [gerarPDF],
+  );
 
   return { gerando, gerarRelatorio };
 }

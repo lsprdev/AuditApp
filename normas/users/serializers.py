@@ -79,12 +79,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             cargo=codigo.cargo or 'Auditor',
         )
 
-        # Cria o perfil de Auditor automaticamente
-        Auditor.objects.create(
-            id_user=user,
-            nome_auditor=name or user.username,
-        )
-
         codigo.usado_por = user
         codigo.usado_em = timezone.now()
         codigo.save(update_fields=['usado_por', 'usado_em'])
@@ -136,10 +130,6 @@ class AdminUsuarioCreateSerializer(serializers.ModelSerializer):
             last_name=last_name,
             cargo=validated_data.get('cargo', 'Auditor'),
             is_active=validated_data.get('is_active', True),
-        )
-        Auditor.objects.create(
-            id_user=user,
-            nome_auditor=name or user.username,
         )
         return user
 

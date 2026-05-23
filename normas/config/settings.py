@@ -25,7 +25,7 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,backend").split(",")
+    for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,backend","https://auditapp.lsx.li").split(",")
     if host.strip()
 ]
 
@@ -64,14 +64,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get(
-        "CORS_ALLOWED_ORIGINS",
-        "http://localhost:5174,http://127.0.0.1:5174,http://localhost,http://127.0.0.1,http://localhost:80,http://127.0.0.1:80",
-    ).split(",")
-    if origin.strip()
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "config.urls"
 

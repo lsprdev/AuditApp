@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import "./styles.css";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo_vermelho.png";
+import { apiUrl } from "../../config/api";
+import "./styles.css";
 
 export default function CadastroPage() {
   const navigate = useNavigate();
@@ -18,8 +19,8 @@ export default function CadastroPage() {
 
   const senhaNormalizada = form.password.trim().toLowerCase();
   const dadosUsuario = [form.nome, form.email, form.username]
-    .map(value => value.trim().toLowerCase())
-    .filter(value => value.length >= 3);
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => value.length >= 3);
   const senhaStatus = [
     {
       label: "Use pelo menos 8 caracteres.",
@@ -27,7 +28,9 @@ export default function CadastroPage() {
     },
     {
       label: "Evite senhas muito comuns, como senha123 ou 12345678.",
-      valid: !["senha123", "12345678", "password", "admin123"].includes(senhaNormalizada),
+      valid: !["senha123", "12345678", "password", "admin123"].includes(
+        senhaNormalizada,
+      ),
     },
     {
       label: "Não use apenas números.",
@@ -35,7 +38,13 @@ export default function CadastroPage() {
     },
     {
       label: "Não use uma senha parecida com seu nome, e-mail ou usuário.",
-      valid: form.password.length > 0 && !dadosUsuario.some(value => senhaNormalizada.includes(value) || value.includes(senhaNormalizada)),
+      valid:
+        form.password.length > 0 &&
+        !dadosUsuario.some(
+          (value) =>
+            senhaNormalizada.includes(value) ||
+            value.includes(senhaNormalizada),
+        ),
     },
   ];
 
@@ -78,7 +87,7 @@ export default function CadastroPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/register/", {
+      const response = await fetch(apiUrl("/api/auth/register/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -107,66 +116,66 @@ export default function CadastroPage() {
 
   const labelStyle = {
     fontFamily: "var(--font-sans)",
-    fontSize: '11px',
-    letterSpacing: '0.15em',
-    textTransform: 'uppercase',
-    color: '#6B0F2B',
-    display: 'block',
-    marginBottom: '4px',
+    fontSize: "11px",
+    letterSpacing: "0.15em",
+    textTransform: "uppercase",
+    color: "#6B0F2B",
+    display: "block",
+    marginBottom: "4px",
   };
 
   const inputStyle = {
-    width: '100%',
-    backgroundColor: 'transparent',
-    border: 'none',
-    borderBottom: '1px solid rgba(107,15,43,0.35)',
-    padding: '6px 0',
-    fontSize: '13px',
-    color: '#6B0F2B',
+    width: "100%",
+    backgroundColor: "transparent",
+    border: "none",
+    borderBottom: "1px solid rgba(107,15,43,0.35)",
+    padding: "6px 0",
+    fontSize: "13px",
+    color: "#6B0F2B",
     fontFamily: "var(--font-sans)",
-    outline: 'none',
-    boxSizing: 'border-box',
+    outline: "none",
+    boxSizing: "border-box",
   };
 
   return (
     <div
       className="cadastro-page auth-page"
       style={{
-        minHeight: '100vh',
-        backgroundColor: '#6B0F2B',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        backgroundColor: "#6B0F2B",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <div
         className="auth-card"
         style={{
-          backgroundColor: '#D4C5A9',
-          borderRadius: '8px',
-          padding: '40px 44px',
-          width: '100%',
-          maxWidth: '480px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          backgroundColor: "#D4C5A9",
+          borderRadius: "8px",
+          padding: "40px 44px",
+          width: "100%",
+          maxWidth: "480px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
         }}
       >
         <img
           src={logo}
           alt="Logo"
           className="auth-card__logo"
-          style={{ height: '80px', width: 'auto', marginBottom: '8px' }}
+          style={{ height: "80px", width: "auto", marginBottom: "8px" }}
         />
         <span
           className="auth-card__brand"
           style={{
             fontFamily: "'Dancing Script', cursive",
             fontWeight: 500,
-            fontSize: '36px',
-            color: '#6B0F2B',
-            marginBottom: '20px',
+            fontSize: "36px",
+            color: "#6B0F2B",
+            marginBottom: "20px",
           }}
         >
           audit premium
@@ -177,10 +186,10 @@ export default function CadastroPage() {
           style={{
             fontFamily: "var(--font-sans)",
             fontWeight: 600,
-            fontSize: '22px',
-            color: '#6B0F2B',
-            marginBottom: '2px',
-            alignSelf: 'flex-start',
+            fontSize: "22px",
+            color: "#6B0F2B",
+            marginBottom: "2px",
+            alignSelf: "flex-start",
           }}
         >
           Credenciamento
@@ -189,11 +198,11 @@ export default function CadastroPage() {
           className="auth-card__subtitle"
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: '14px',
-            color: 'rgba(107,15,43,0.55)',
-            marginBottom: '20px',
-            alignSelf: 'flex-start',
-            letterSpacing: '0.03em',
+            fontSize: "14px",
+            color: "rgba(107,15,43,0.55)",
+            marginBottom: "20px",
+            alignSelf: "flex-start",
+            letterSpacing: "0.03em",
           }}
         >
           Cadastre suas credenciais para continuar
@@ -201,38 +210,89 @@ export default function CadastroPage() {
 
         <form
           onSubmit={handleSubmit}
-          style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '14px' }}
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: "14px",
+          }}
         >
           <div>
             <label style={labelStyle}>Nome Completo</label>
-            <input type="text" name="nome" required value={form.nome} onChange={handleChange} placeholder="Ex: Dr. Fulano da Silva" style={inputStyle} />
+            <input
+              type="text"
+              name="nome"
+              required
+              value={form.nome}
+              onChange={handleChange}
+              placeholder="Ex: Dr. Fulano da Silva"
+              style={inputStyle}
+            />
           </div>
 
           <div>
             <label style={labelStyle}>Email Corporativo</label>
-            <input type="email" name="email" required value={form.email} onChange={handleChange} placeholder="exemplo@organizacao.com" style={inputStyle} />
+            <input
+              type="email"
+              name="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              placeholder="exemplo@organizacao.com"
+              style={inputStyle}
+            />
           </div>
 
           <div>
             <label style={labelStyle}>Nome de Usuário</label>
-            <input type="text" name="username" required value={form.username} onChange={handleChange} placeholder="Seu nome de usuário" style={inputStyle} />
+            <input
+              type="text"
+              name="username"
+              required
+              value={form.username}
+              onChange={handleChange}
+              placeholder="Seu nome de usuário"
+              style={inputStyle}
+            />
           </div>
 
           <div>
             <label style={labelStyle}>Código de Acesso</label>
-            <input type="text" name="accessCode" required value={form.accessCode} onChange={handleChange} placeholder="Código fornecido pela administração" style={inputStyle} />
+            <input
+              type="text"
+              name="accessCode"
+              required
+              value={form.accessCode}
+              onChange={handleChange}
+              placeholder="Código fornecido pela administração"
+              style={inputStyle}
+            />
           </div>
 
           <div>
             <label style={labelStyle}>Senha</label>
-            <input type="password" name="password" required value={form.password} onChange={handleChange} placeholder="Mínimo 8 caracteres" style={inputStyle} />
+            <input
+              type="password"
+              name="password"
+              required
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Mínimo 8 caracteres"
+              style={inputStyle}
+            />
             <div className="cadastro-page__password-help" aria-live="polite">
               <strong>A senha precisa seguir estes critérios:</strong>
               <ul>
-                {senhaStatus.map(item => (
+                {senhaStatus.map((item) => (
                   <li
                     key={item.label}
-                    className={form.password ? (item.valid ? "is-valid" : "is-invalid") : ""}
+                    className={
+                      form.password
+                        ? item.valid
+                          ? "is-valid"
+                          : "is-invalid"
+                        : ""
+                    }
                   >
                     {item.label}
                   </li>
@@ -243,35 +303,53 @@ export default function CadastroPage() {
 
           <div>
             <label style={labelStyle}>Confirmar Senha</label>
-            <input type="password" name="confirmPassword" required value={form.confirmPassword} onChange={handleChange} placeholder="Confirme sua senha" style={inputStyle} />
+            <input
+              type="password"
+              name="confirmPassword"
+              required
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirme sua senha"
+              style={inputStyle}
+            />
           </div>
 
           {error && (
-            <p style={{ color: '#7f1d1d', fontSize: '12px', textAlign: 'center' }}>{error}</p>
+            <p
+              style={{
+                color: "#7f1d1d",
+                fontSize: "12px",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
           )}
 
           <button
             type="submit"
             disabled={loading}
             style={{
-              marginTop: '8px',
-              width: '100%',
-              padding: '12px',
-              borderRadius: '6px',
-              backgroundColor: '#6B0F2B',
-              color: '#D4C5A9',
-              border: 'none',
+              marginTop: "8px",
+              width: "100%",
+              padding: "12px",
+              borderRadius: "6px",
+              backgroundColor: "#6B0F2B",
+              color: "#D4C5A9",
+              border: "none",
               fontFamily: "var(--font-sans)",
-              fontSize: '13px',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
+              fontSize: "13px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
               fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: loading ? "not-allowed" : "pointer",
               opacity: loading ? 0.6 : 1,
-              transition: 'all 0.3s ease',
+              transition: "all 0.3s ease",
             }}
-            onMouseEnter={e => !loading && (e.target.style.backgroundColor = '#5a0c24')}
-            onMouseLeave={e => (e.target.style.backgroundColor = '#6B0F2B')}
+            onMouseEnter={(e) =>
+              !loading && (e.target.style.backgroundColor = "#5a0c24")
+            }
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "#6B0F2B")}
           >
             {loading ? "Criando Registro..." : "Cadastrar Auditor"}
           </button>
@@ -280,13 +358,20 @@ export default function CadastroPage() {
         <p
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: '14px',
-            color: 'rgba(107,15,43,0.6)',
-            marginTop: '20px',
+            fontSize: "14px",
+            color: "rgba(107,15,43,0.6)",
+            marginTop: "20px",
           }}
         >
           Já possui login?{" "}
-          <Link to="/login" style={{ color: '#6B0F2B', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+          <Link
+            to="/login"
+            style={{
+              color: "#6B0F2B",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
             Fazer login
           </Link>
         </p>

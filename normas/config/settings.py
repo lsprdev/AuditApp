@@ -16,6 +16,11 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def env_list(name, default):
+    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
+
+
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-km3ok#rgwm7otb4dpok8su_gx5++%tjbt0nhlsen=!7%4+#bf-",
@@ -23,11 +28,10 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,backend,auditapp.lsx.li")
-    if host.strip()
-]
+ALLOWED_HOSTS = env_list(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1,backend,auditapp.lsx.li",
+)
 
 AUTH_USER_MODEL = "users.Usuario"
 
@@ -64,7 +68,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = env_list(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost,http://127.0.0.1,http://localhost:5173,http://127.0.0.1:5173,https://auditapp.lsx.li",
+)
+CORS_ALLOW_ALL_ORIGINS = False
+CSRF_TRUSTED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin.startswith("https://")]
 
 ROOT_URLCONF = "config.urls"
 

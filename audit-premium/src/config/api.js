@@ -22,12 +22,16 @@ export function apiUrl(path = "") {
 }
 
 export function controlesUrl(path = "") {
-  const suffix = path ? `/controles${normalizePath(path)}` : "/controles";
+  const suffix = path ? `/api/controles${normalizePath(path)}` : "/api/controles";
   return `${API_BASE_URL}${suffix}`;
 }
 
 export function mediaUrl(path = "") {
   if (!path) return "";
   if (/^https?:\/\//i.test(path)) return path;
-  return `${API_BASE_URL}${normalizePath(path)}`;
+  const normalizedPath = normalizePath(path);
+  const apiPath = normalizedPath.startsWith("/media/")
+    ? `/api${normalizedPath}`
+    : normalizedPath;
+  return `${API_BASE_URL}${apiPath}`;
 }

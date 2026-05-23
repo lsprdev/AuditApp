@@ -1,5 +1,5 @@
 # Estágio 1: Build do código do React usando uma imagem leve do Node
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 

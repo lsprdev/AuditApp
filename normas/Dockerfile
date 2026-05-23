@@ -1,5 +1,5 @@
 # Usa uma imagem oficial estável e leve do Python
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Evita que o Python grave arquivos .pyc e faça buffering no terminal
 ENV PYTHONDONTWRITEBYTECODE=1

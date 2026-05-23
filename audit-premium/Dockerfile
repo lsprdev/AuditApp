@@ -18,8 +18,6 @@ RUN npm run build
 # Estágio 2: Servidor Web Nginx de alto desempenho para produção
 FROM nginx:1.25-alpine
 
-ENV BACKEND_UPSTREAM=backend:8000
-
 # Limpa a página de boas-vindas padrão do Nginx
 RUN rm -rf /usr/share/nginx/html/*
 
@@ -27,10 +25,10 @@ RUN rm -rf /usr/share/nginx/html/*
 # OBS: Se o seu projeto usa Vite, mude "build" para "dist" (e vice-versa se for CRA)
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copia a configuração de rotas e proxy reverso para o contêiner
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+# Copia a configuração de rotas da SPA para o contêiner
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expõe a porta padrão do tráfego web
 EXPOSE 80
 
-CMD ["sh", "-c", "envsubst '$BACKEND_UPSTREAM' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["nginx", "-g", "daemon off;"]

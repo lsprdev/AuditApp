@@ -1,93 +1,172 @@
 import React, { useEffect, useState } from "react";
 import "./styles.css";
 import Sidebar from "../../components/Sidebar";
-import { Shield, Database, Layout, Award } from "lucide-react";
+import { Shield, Database, Layout, Award, ZoomIn, ZoomOut, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const useCases = [
-  {
-    actor: "Usuário autenticado",
-    cases: ["Autenticar", "Visualizar perfil", "Consultar normas", "Visualizar dashboard"],
-  },
-  {
-    actor: "Auditor",
-    cases: ["Gerenciar empresas", "Gerenciar auditorias", "Responder controles", "Anexar evidências"],
-  },
-  {
-    actor: "Administrador",
-    cases: ["Gerenciar usuários", "Gerenciar códigos", "Consultar logs", "Editar auditoria concluída"],
-  },
+const adminUseCases = [
+  "Visualizar home",
+  "Criar auditorias",
+  "Gerenciar todas auditorias",
+  "Responder todas auditorias",
+  "Visualizar dashboard completo com histórico",
+  "Gerenciar todas empresas",
+  "Gerenciar funcionários",
+  "Criar códigos de acesso",
 ];
 
-const classGroups = [
-  {
-    title: "Usuários",
-    classes: ["Usuario", "Auditor", "CodigoAcessoCadastro", "LogUsuario"],
-  },
-  {
-    title: "Normas e Controles",
-    classes: ["Norma", "Controle27002", "Controle27701", "TipoControle", "AtributosAnexos"],
-  },
-  {
-    title: "Auditoria",
-    classes: ["Empresa", "Auditoria", "RespostasAuditoria27002", "RespostasAuditoria27701"],
-  },
-  {
-    title: "Evidências e Logs",
-    classes: ["Evidencias27002", "Evidencias27701", "LogModificacao"],
-  },
+const auditorUseCases = [
+  "Visualizar home",
+  "Criar auditorias",
+  "Responder auditorias",
+  "Visualizar dashboard parcial",
+  "Gerar relatórios",
+  "Gerenciar próprias auditorias",
+  "Gerenciar próprias empresas",
 ];
 
 const sequenceSteps = [
-  ["Auditor", "React App", "Acessa auditoria e escolhe responder"],
-  ["React App", "API Django", "Busca próximo controle pendente"],
+  ["Auditor", "React App", "Abre a auditoria e inicia resposta"],
+  ["React App", "API Django", "Solicita próximo controle pendente"],
   ["API Django", "Banco de Dados", "Consulta auditoria, controle e resposta"],
-  ["Auditor", "React App", "Preenche situação, observações e justificativa"],
-  ["React App", "API Django", "Salva resposta do controle"],
-  ["API Django", "Banco de Dados", "Atualiza resposta e registra log"],
-  ["React App", "API Django", "Envia arquivo de evidência"],
-  ["API Django", "Arquivos/Media", "Salva evidência e atualiza relatório"],
+  ["Auditor", "React App", "Informa situação, observações e justificativa"],
+  ["React App", "API Django", "Envia resposta do controle"],
+  ["API Django", "Banco de Dados", "Salva resposta e registra histórico"],
+  ["React App", "API Django", "Anexa evidência quando necessário"],
+  ["API Django", "Arquivos/Media", "Armazena arquivo e atualiza relatório"],
+  ["Auditor", "React App", "Visualiza dashboard e relatório gerado"],
 ];
 
 function UseCaseDiagram() {
   return (
     <div className="uml-usecase-diagram">
-      {useCases.map((group) => (
-        <div className="uml-actor-column" key={group.actor}>
-          <div className="uml-actor">
-            <span className="uml-actor-head" />
-            <span className="uml-actor-body" />
-            <span className="uml-actor-label">{group.actor}</span>
+      <div className="uml-stick-actor uml-stick-actor-left">
+        <span className="uml-actor-head" />
+        <span className="uml-actor-body" />
+        <strong>Auditor</strong>
+        <small>(Usuário)</small>
+      </div>
+
+      <div className="uml-system-boundary">
+        <div className="uml-system-title">AUDITAPP - SYSTEM</div>
+        <div className="uml-usecase-columns">
+          <div className="uml-usecase-column auditor-cases">
+            <h4>Auditor</h4>
+            {auditorUseCases.map((item) => (
+              <div className="uml-usecase" key={item}>
+                {item}
+              </div>
+            ))}
           </div>
-          <div className="uml-usecase-list">
-            {group.cases.map((item) => (
+          <div className="uml-usecase-column admin-cases">
+            <h4>Admin</h4>
+            {adminUseCases.map((item) => (
               <div className="uml-usecase" key={item}>
                 {item}
               </div>
             ))}
           </div>
         </div>
-      ))}
+      </div>
+
+      <div className="uml-stick-actor uml-stick-actor-right">
+        <span className="uml-actor-head" />
+        <span className="uml-actor-body" />
+        <strong>Admin</strong>
+        <small>(Superuser)</small>
+      </div>
     </div>
   );
 }
 
 function ClassDiagram() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+
+  const openModal = () => {
+    setZoom(1.15);
+    setIsOpen(true);
+  };
+
   return (
-    <div className="uml-class-diagram">
-      {classGroups.map((group) => (
-        <div className="uml-class-group" key={group.title}>
-          <div className="uml-class-group-title">{group.title}</div>
-          {group.classes.map((className) => (
-            <div className="uml-class-box" key={className}>
-              <div className="uml-class-name">{className}</div>
-              <div className="uml-class-row">+ id</div>
-              <div className="uml-class-row">+ atributos principais</div>
-              <div className="uml-class-row">+ relacionamentos</div>
-            </div>
-          ))}
+    <>
+      <button className="uml-class-image-frame" type="button" onClick={openModal}>
+        <img src="/diagrama_classe.png" alt="Diagrama de classes do AuditApp" />
+        <span>Ampliar diagrama</span>
+      </button>
+
+      {isOpen && (
+        <div className="diagram-lightbox" role="dialog" aria-modal="true" aria-label="Diagrama de classes ampliado">
+          <div className="diagram-lightbox-toolbar">
+            <button type="button" onClick={() => setZoom((value) => Math.min(value + 0.2, 2.4))}>
+              <ZoomIn size={16} />
+              Ampliar
+            </button>
+            <button type="button" onClick={() => setZoom((value) => Math.max(value - 0.2, 0.8))}>
+              <ZoomOut size={16} />
+              Reduzir
+            </button>
+            <button type="button" onClick={() => setIsOpen(false)} aria-label="Fechar diagrama ampliado">
+              <X size={16} />
+              Fechar
+            </button>
+          </div>
+          <div className="diagram-lightbox-canvas">
+            <img
+              src="/diagrama_classe.png"
+              alt="Diagrama de classes do AuditApp ampliado"
+              style={{ width: `${zoom * 100}%` }}
+            />
+          </div>
         </div>
-      ))}
+      )}
+    </>
+  );
+}
+function DeploymentDiagram() {
+  return (
+    <div className="uml-deployment-diagram">
+      <div className="uml-node user-device">
+        <div className="uml-node-title">&lt;&lt;node&gt;&gt; Dispositivo do Usuário</div>
+        <div className="uml-component browser-component">
+          <strong>&lt;&lt;component&gt;&gt; Navegador Web</strong>
+          <span>Chrome / Firefox / Edge</span>
+          <small>Executa SPA React compilada em HTML5, JS e CSS.</small>
+        </div>
+      </div>
+
+      <div className="uml-deploy-link public-link">HTTPS / HTTP<br />Porta pública 80 / 443</div>
+
+      <div className="uml-node hosting-node">
+        <div className="uml-node-title">&lt;&lt;node&gt;&gt; Servidor de Hospedagem</div>
+        <div className="uml-node docker-subsystem">
+          <div className="uml-node-title">&lt;&lt;subsystem&gt;&gt; Ambiente Docker audit_network</div>
+          <div className="uml-container frontend-container">
+            <strong>&lt;&lt;container&gt;&gt; audit_frontend</strong>
+            <span>Web Server Nginx</span>
+            <small>Serve o front e faz proxy reverso para /api, /controles e /media.</small>
+          </div>
+          <div className="uml-deploy-link internal-link">HTTP interno<br />porta 8000</div>
+          <div className="uml-container backend-container">
+            <strong>&lt;&lt;container&gt;&gt; audit_backend</strong>
+            <span>Django REST Framework + Gunicorn</span>
+            <small>Executa regras de negócio, autenticação JWT e ORM.</small>
+          </div>
+          <div className="uml-deploy-link internal-link">Driver MySQL<br />porta 3306</div>
+          <div className="uml-container db-container">
+            <strong>&lt;&lt;container&gt;&gt; audit_db</strong>
+            <span>MySQL 8.0</span>
+            <small>Processamento relacional e consultas SQL.</small>
+          </div>
+        </div>
+
+        <div className="uml-deploy-link storage-link">Escrita física de arquivos</div>
+        <div className="uml-device storage-device">
+          <strong>&lt;&lt;device&gt;&gt; Armazenamento Local</strong>
+          <span>&lt;&lt;volume&gt;&gt; mysql_data</span>
+          <small>Persistência automática do Docker em HD/SSD do servidor.</small>
+        </div>
+      </div>
     </div>
   );
 }
@@ -498,11 +577,11 @@ export default function SobreNosPage() {
 
         <section className="sobre-diagramas-section">
           <div className="sobre-section-heading">
-            <p>Modelagem do Sistema</p>
+            <p>Documentação</p>
             <h3>Diagramas do Audit Premium</h3>
             <span>
-              Representação visual dos atores, entidades principais e fluxo de resposta
-              de auditoria implementados na aplicação.
+              Representação visual dos atores, entidades principais, fluxo de resposta
+              e arquitetura de implantação da aplicação.
             </span>
           </div>
 
@@ -510,8 +589,8 @@ export default function SobreNosPage() {
             <div className="sobre-diagram-copy">
               <p>Diagrama de Caso de Uso</p>
               <span>
-                Mostra como usuário autenticado, auditor e administrador interagem com
-                as principais funcionalidades.
+                Mostra como auditor e administrador interagem com login, painel,
+                auditorias, normas, evidências e área institucional.
               </span>
             </div>
             <UseCaseDiagram />
@@ -521,8 +600,8 @@ export default function SobreNosPage() {
             <div className="sobre-diagram-copy">
               <p>Diagrama de Classes</p>
               <span>
-                Organiza as entidades do backend em grupos de responsabilidade e
-                destaca a estrutura central de auditorias, controles, respostas e evidências.
+                Usa como base a estrutura conceitual de usuário, empresa, auditoria,
+                resposta e controles ISO 27002/27701, com atributos principais.
               </span>
             </div>
             <ClassDiagram />
@@ -532,11 +611,23 @@ export default function SobreNosPage() {
             <div className="sobre-diagram-copy">
               <p>Diagrama UML de Sequência</p>
               <span>
-                Descreve o fluxo de resposta de controle, persistência de logs e anexação
-                de evidências.
+                Representa somente o processo de responder uma auditoria: abertura do
+                controle pendente, registro da resposta, anexação de evidências e
+                visualização do dashboard/relatório final.
               </span>
             </div>
             <SequenceDiagram />
+          </div>
+
+          <div className="sobre-diagram-card">
+            <div className="sobre-diagram-copy">
+              <p>Diagrama UML de Implantação</p>
+              <span>
+                Apresenta navegador, Nginx, backend Django, banco MySQL e persistência
+                em disco dentro da rede Docker do projeto.
+              </span>
+            </div>
+            <DeploymentDiagram />
           </div>
         </section>
 

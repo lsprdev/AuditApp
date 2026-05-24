@@ -4,6 +4,137 @@ import Sidebar from "../../components/Sidebar";
 import { Shield, Database, Layout, Award } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const useCases = [
+  {
+    actor: "Usuário autenticado",
+    cases: ["Autenticar", "Visualizar perfil", "Consultar normas", "Visualizar dashboard"],
+  },
+  {
+    actor: "Auditor",
+    cases: ["Gerenciar empresas", "Gerenciar auditorias", "Responder controles", "Anexar evidências"],
+  },
+  {
+    actor: "Administrador",
+    cases: ["Gerenciar usuários", "Gerenciar códigos", "Consultar logs", "Editar auditoria concluída"],
+  },
+];
+
+const classGroups = [
+  {
+    title: "Usuários",
+    classes: ["Usuario", "Auditor", "CodigoAcessoCadastro", "LogUsuario"],
+  },
+  {
+    title: "Normas e Controles",
+    classes: ["Norma", "Controle27002", "Controle27701", "TipoControle", "AtributosAnexos"],
+  },
+  {
+    title: "Auditoria",
+    classes: ["Empresa", "Auditoria", "RespostasAuditoria27002", "RespostasAuditoria27701"],
+  },
+  {
+    title: "Evidências e Logs",
+    classes: ["Evidencias27002", "Evidencias27701", "LogModificacao"],
+  },
+];
+
+const sequenceSteps = [
+  ["Auditor", "React App", "Acessa auditoria e escolhe responder"],
+  ["React App", "API Django", "Busca próximo controle pendente"],
+  ["API Django", "Banco de Dados", "Consulta auditoria, controle e resposta"],
+  ["Auditor", "React App", "Preenche situação, observações e justificativa"],
+  ["React App", "API Django", "Salva resposta do controle"],
+  ["API Django", "Banco de Dados", "Atualiza resposta e registra log"],
+  ["React App", "API Django", "Envia arquivo de evidência"],
+  ["API Django", "Arquivos/Media", "Salva evidência e atualiza relatório"],
+];
+
+function UseCaseDiagram() {
+  return (
+    <div className="uml-usecase-diagram">
+      {useCases.map((group) => (
+        <div className="uml-actor-column" key={group.actor}>
+          <div className="uml-actor">
+            <span className="uml-actor-head" />
+            <span className="uml-actor-body" />
+            <span className="uml-actor-label">{group.actor}</span>
+          </div>
+          <div className="uml-usecase-list">
+            {group.cases.map((item) => (
+              <div className="uml-usecase" key={item}>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ClassDiagram() {
+  return (
+    <div className="uml-class-diagram">
+      {classGroups.map((group) => (
+        <div className="uml-class-group" key={group.title}>
+          <div className="uml-class-group-title">{group.title}</div>
+          {group.classes.map((className) => (
+            <div className="uml-class-box" key={className}>
+              <div className="uml-class-name">{className}</div>
+              <div className="uml-class-row">+ id</div>
+              <div className="uml-class-row">+ atributos principais</div>
+              <div className="uml-class-row">+ relacionamentos</div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SequenceDiagram() {
+  const participants = ["Auditor", "React App", "API Django", "Banco de Dados", "Arquivos/Media"];
+
+  return (
+    <div className="uml-sequence-diagram">
+      <div className="uml-participants">
+        {participants.map((participant) => (
+          <div className="uml-participant" key={participant}>
+            {participant}
+          </div>
+        ))}
+      </div>
+      <div className="uml-sequence-body">
+        {participants.map((participant) => (
+          <div className="uml-lifeline" key={participant} />
+        ))}
+        <div className="uml-sequence-steps">
+          {sequenceSteps.map(([from, to, label], index) => {
+            const fromIndex = participants.indexOf(from);
+            const toIndex = participants.indexOf(to);
+            const left = Math.min(fromIndex, toIndex);
+            const span = Math.abs(toIndex - fromIndex) + 1;
+
+            return (
+              <div
+                className="uml-message"
+                key={`${from}-${to}-${label}`}
+                style={{
+                  gridColumn: `${left + 1} / span ${span}`,
+                  gridRow: index + 1,
+                }}
+              >
+                <span className={fromIndex <= toIndex ? "uml-arrow-right" : "uml-arrow-left"} />
+                <span className="uml-message-label">{label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SobreNosPage() {
   const [userName, setUserName] = useState("Fulano da Silva");
   const [userRole, setUserRole] = useState("Administrador");
@@ -364,6 +495,50 @@ export default function SobreNosPage() {
             ))}
           </div>
         </div>
+
+        <section className="sobre-diagramas-section">
+          <div className="sobre-section-heading">
+            <p>Modelagem do Sistema</p>
+            <h3>Diagramas do Audit Premium</h3>
+            <span>
+              Representação visual dos atores, entidades principais e fluxo de resposta
+              de auditoria implementados na aplicação.
+            </span>
+          </div>
+
+          <div className="sobre-diagram-card">
+            <div className="sobre-diagram-copy">
+              <p>Diagrama de Caso de Uso</p>
+              <span>
+                Mostra como usuário autenticado, auditor e administrador interagem com
+                as principais funcionalidades.
+              </span>
+            </div>
+            <UseCaseDiagram />
+          </div>
+
+          <div className="sobre-diagram-card">
+            <div className="sobre-diagram-copy">
+              <p>Diagrama de Classes</p>
+              <span>
+                Organiza as entidades do backend em grupos de responsabilidade e
+                destaca a estrutura central de auditorias, controles, respostas e evidências.
+              </span>
+            </div>
+            <ClassDiagram />
+          </div>
+
+          <div className="sobre-diagram-card">
+            <div className="sobre-diagram-copy">
+              <p>Diagrama UML de Sequência</p>
+              <span>
+                Descreve o fluxo de resposta de controle, persistência de logs e anexação
+                de evidências.
+              </span>
+            </div>
+            <SequenceDiagram />
+          </div>
+        </section>
 
         {/* Rodapé interno */}
         <div

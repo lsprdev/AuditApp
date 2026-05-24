@@ -4,6 +4,325 @@
   --page-accent: #d4c5a9;
 }
 
+.sobre-diagramas-section {
+  display: grid;
+  gap: 24px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(107, 15, 43, 0.08);
+  border-radius: 8px;
+  padding: 40px;
+}
+
+.sobre-section-heading {
+  max-width: 780px;
+}
+
+.sobre-section-heading p,
+.sobre-diagram-copy p {
+  margin: 0;
+  color: rgba(107, 15, 43, 0.6);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.sobre-section-heading h3 {
+  margin: 8px 0 10px;
+  color: var(--page-primary);
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.sobre-section-heading span,
+.sobre-diagram-copy span {
+  display: block;
+  color: rgba(107, 15, 43, 0.58);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.sobre-diagram-card {
+  display: grid;
+  gap: 22px;
+  background: #fffdf9;
+  border: 1px solid rgba(107, 15, 43, 0.1);
+  border-radius: 8px;
+  padding: 28px;
+  overflow: hidden;
+}
+
+.sobre-diagram-copy {
+  max-width: 760px;
+}
+
+.sobre-diagram-copy p {
+  color: var(--page-primary);
+  margin-bottom: 8px;
+}
+
+.uml-usecase-diagram,
+.uml-class-diagram,
+.uml-sequence-diagram {
+  width: 100%;
+  overflow-x: auto;
+  padding: 18px;
+  border: 1px solid rgba(107, 15, 43, 0.08);
+  border-radius: 8px;
+  background:
+    linear-gradient(rgba(107, 15, 43, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107, 15, 43, 0.035) 1px, transparent 1px),
+    #ffffff;
+  background-size: 28px 28px;
+}
+
+.uml-usecase-diagram {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 28px;
+  min-width: 760px;
+}
+
+.uml-actor-column {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.uml-actor {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: var(--page-primary);
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+
+.uml-actor-head {
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--page-primary);
+  border-radius: 50%;
+  background: #fffdf9;
+}
+
+.uml-actor-body {
+  width: 52px;
+  height: 48px;
+  border-top: 2px solid var(--page-primary);
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  position: relative;
+}
+
+.uml-actor-body::before,
+.uml-actor-body::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 2px;
+  height: 46px;
+  background: var(--page-primary);
+  transform-origin: top;
+}
+
+.uml-actor-body::before {
+  transform: rotate(28deg);
+}
+
+.uml-actor-body::after {
+  transform: rotate(-28deg);
+}
+
+.uml-actor-label {
+  font-size: 13px;
+  text-align: center;
+}
+
+.uml-usecase-list {
+  display: grid;
+  gap: 12px;
+}
+
+.uml-usecase {
+  display: grid;
+  min-height: 58px;
+  place-items: center;
+  border: 1px solid rgba(107, 15, 43, 0.22);
+  border-radius: 50%;
+  background: rgba(212, 197, 169, 0.18);
+  color: rgba(107, 15, 43, 0.82);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px 18px;
+}
+
+.uml-class-diagram {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 18px;
+  min-width: 980px;
+}
+
+.uml-class-group {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.uml-class-group-title {
+  color: rgba(107, 15, 43, 0.65);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.uml-class-box {
+  overflow: hidden;
+  border: 1px solid rgba(107, 15, 43, 0.22);
+  border-radius: 8px;
+  background: #fffdf9;
+  box-shadow: 0 10px 24px rgba(107, 15, 43, 0.06);
+}
+
+.uml-class-name {
+  background: var(--page-primary);
+  color: var(--page-accent);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 12px;
+}
+
+.uml-class-row {
+  border-top: 1px solid rgba(107, 15, 43, 0.12);
+  color: rgba(107, 15, 43, 0.7);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  padding: 8px 12px;
+}
+
+.uml-sequence-diagram {
+  min-width: 920px;
+}
+
+.uml-participants,
+.uml-sequence-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.uml-participant {
+  border: 1px solid rgba(107, 15, 43, 0.2);
+  border-radius: 8px;
+  background: var(--page-primary);
+  color: var(--page-accent);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px;
+  text-align: center;
+}
+
+.uml-sequence-body {
+  position: relative;
+  margin-top: 10px;
+}
+
+.uml-lifeline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  border-left: 1px dashed rgba(107, 15, 43, 0.28);
+}
+
+.uml-lifeline:nth-child(1) {
+  left: 10%;
+}
+
+.uml-lifeline:nth-child(2) {
+  left: 30%;
+}
+
+.uml-lifeline:nth-child(3) {
+  left: 50%;
+}
+
+.uml-lifeline:nth-child(4) {
+  left: 70%;
+}
+
+.uml-lifeline:nth-child(5) {
+  left: 90%;
+}
+
+.uml-sequence-steps {
+  position: relative;
+  z-index: 1;
+  grid-auto-rows: 52px;
+  padding: 12px 0;
+}
+
+.uml-message {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  position: relative;
+}
+
+.uml-message-label {
+  justify-self: center;
+  max-width: 260px;
+  border: 1px solid rgba(107, 15, 43, 0.12);
+  border-radius: 8px;
+  background: #fffdf9;
+  color: rgba(107, 15, 43, 0.72);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 9px;
+  text-align: center;
+}
+
+.uml-arrow-right,
+.uml-arrow-left {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: rgba(107, 15, 43, 0.55);
+}
+
+.uml-arrow-right::after,
+.uml-arrow-left::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid rgba(107, 15, 43, 0.65);
+  border-right: 1px solid rgba(107, 15, 43, 0.65);
+}
+
+.uml-arrow-right::after {
+  right: 0;
+  transform: rotate(45deg);
+}
+
+.uml-arrow-left::after {
+  left: 0;
+  transform: rotate(-135deg);
+}
+
 @media (max-width: 980px) {
   .sobre-nos-page main > div[style*="grid-template-columns"] {
     grid-template-columns: 1fr !important;
@@ -38,5 +357,20 @@
 
   .sobre-nos-page [style*="grid-template-columns: repeat(3, 1fr)"] {
     grid-template-columns: 1fr !important;
+  }
+
+  .sobre-diagramas-section,
+  .sobre-diagram-card {
+    padding: 22px !important;
+  }
+
+  .sobre-section-heading h3 {
+    font-size: 24px;
+  }
+
+  .uml-usecase-diagram,
+  .uml-class-diagram,
+  .uml-sequence-diagram {
+    padding: 14px;
   }
 }
